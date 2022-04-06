@@ -4,6 +4,7 @@ import router from "./router";
 import store from "./store";
 
 import "./assets/stylus/index.styl";
+import "./components/globalComponents";
 
 Vue.config.productionTip = false;
 
