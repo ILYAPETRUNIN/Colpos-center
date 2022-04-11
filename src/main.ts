@@ -5,6 +5,7 @@ import store from "./store";
 
 import "./assets/stylus/index.styl";
 import "./components/globalComponents";
+import "./plugins/index.js";
 
 Vue.config.productionTip = false;
 

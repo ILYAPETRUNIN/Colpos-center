@@ -1,7 +1,11 @@
 <template>
   <div class="ui-kit">
-    <h3>Набор компонентов</h3>
-    <svg-icon name="whatsapp" class="base-chip__icon" />
+    <h1>Набор компонентов</h1>
+    <div class="ui-kit__input ui-kit__input_light">
+      <h3>Элементы ввода</h3>
+      <base-text-field suffixIcon="messange-cloud" />
+      <svg-icon name="messange-cloud" />
+    </div>
   </div>
 </template>
 
@@ -15,8 +19,15 @@ export default {
 <style lang="stylus" scoped>
 @require '~@/assets/stylus/vars/variables';
 @require '~@/assets/stylus/mixins/mixins';
+$background=$theme-light.primary.base
+
 .ui-kit
-  flexy(center,center)
+  flexy(center,center,nowrap,column)
+  &__input
+    padding 30px
+    &_light
+      background:$background
+
 .base-chip__icon
   font-size 24px
 </style>
