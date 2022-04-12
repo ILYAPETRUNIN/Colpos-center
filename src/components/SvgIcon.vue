@@ -1,47 +1,64 @@
 <template>
-  <svg :class="className" xmlns="http://www.w3.org/2000/svg">
+  <svg class="svg-icon" :class="classes" v-bind="iconSettings" xmlns="http://www.w3.org/2000/svg">
     <title v-if="title">{{ title }}</title>
-    <use :xlink:href="iconPath" xmlns:xlink="http://www.w3.org/1999/xlink" />
+    <use :xlink:href="`#${name}`" xmlns:xlink="http://www.w3.org/1999/xlink" />
   </svg>
 </template>
 
 <script>
 export default {
-  name: "svg-icon",
+  name: "SvgIcon",
 
   props: {
     name: {
       type: String,
       required: true,
     },
-
     title: {
       type: String,
+      default: null,
+    },
+    iconSettings: {
+      type: Object,
       default: null,
     },
   },
 
   computed: {
-    iconPath() {
-      let icon = require(`@/assets/icons/${this.name}.svg`);
-      if (Object.prototype.hasOwnProperty.call(icon, "default")) {
-        icon = icon.default;
-      }
-
-      return icon.url;
+    classes() {
+      const prefix = "svg-icon";
+      return {
+        [`${prefix}--${this.name}`]: true,
+        [`${prefix}--filled`]: this.filled,
+        [`${prefix}--stroked`]: this.stroked,
+        [`${prefix}--${this.color}`]: this.color,
+      };
     },
+  },
 
-    className() {
-      return "svg-icon svg-icon--" + this.name;
+  watch: {
+    name: async function (value) {
+      await this.fetch(value);
+    },
+  },
+
+  async beforeMount() {
+    await this.fetch(this.name);
+  },
+
+  methods: {
+    async fetch(name) {
+      await require(`@/assets/icons/${name}.svg`);
     },
   },
 };
 </script>
 
-<style>
+<style lang="stylus">
 .svg-icon {
-  fill: currentColor;
-  height: 24px;
-  width: 24px;
+  font-size: inherit;
+  color:inherit
+  fill currentColor
+  stroke currentColor
 }
 </style>

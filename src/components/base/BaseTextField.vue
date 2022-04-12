@@ -1,37 +1,87 @@
 <template>
-  <div class="base-text-field" :class="classes">
-    <svg-icon v-if="preffixIcon" :name="preffixIcon" />
-    <input
-      @focus="focused = true"
-      @blur="focused = false"
-      class="base-text-field__input"
-      type="text"
-      :placeholder="label"
-    />
-    <svg-icon v-if="suffixIcon" :name="suffixIcon" />
-  </div>
+  <validation-provider :rules='(isEmail ? "email|" :"")+rules' v-slot="{ errors,classes}">
+    <div @click='focus'  class="base-text-field" :class="[classes,getClasses]">
+      <div class='base-text-field__wrapper'>
+        <svg-icon class="base-text-field__icon"  v-if="preffixIcon" :name="preffixIcon" />
+        <input
+          :id='_uid'
+          v-mask="isTel ?'+7(###)-###-##-##':''"
+          v-model='inputVal'
+          @focus="focusfocused = true"
+          @blur="focused = false"
+          class="base-text-field__input"
+          type="text"
+          :placeholder="label"
+          :disabled='disabled'
+        />
+      </div>
+      <label :disabled='disabled'  :for="_uid" @click='clickSuffix'>
+        <slot name='suffix'>
+          <svg-icon
+            class="base-text-field__icon"
+            v-if="(isText && suffixIcon) || !isText"
+            :name="suffixIcon ? suffixIcon : type"
+          />
+        </slot>
+      </label>
+    </div>
+    <div class='base-text-field__errors'>
+      <div class='shake-horizontal' v-if='errors.length>0'>{{ errors[0] }}</div>
+    </div>
+  </validation-provider>
 </template>
 
 <script>
+import { ValidationProvider, extend , configure} from "vee-validate";
+import { VueMaskDirective } from 'v-mask'
+import { required,email } from "vee-validate/dist/rules";
+
+extend("required", {...required,message: "*Заполните обязательное поле",});
+extend("email", {...email,message: "*Не корректный email",});
+
+configure({
+  classes: {
+    invalid: 'base-text-field_invalid',
+  }
+})
+
 export default {
+  components: { ValidationProvider },
+  directives: {'mask':VueMaskDirective},
   data() {
     return {
       focused: false,
     };
   },
   computed: {
-    classes() {
+    inputVal: {
+      get() {
+          return this.value;
+      },
+      set(value) {
+          this.$emit("input", value);
+      }
+    },
+    isText(){return this.type=="text"},
+    isEmail(){return this.type=="email"},
+    isTel(){return this.type=="tel"},
+    getClasses() {
       const prefix = "base-text-field";
       return [
         `${prefix}_${this.theme}`,
-        this.focused ? `${prefix}_focused` : "",
+        (this.focused && this.focusable) ? `${prefix}_focused` : "",
+        this.disabled ? `${prefix}_disabled` :""
       ];
     },
   },
   props: {
+    value: {
+      type: String,
+      default:''
+    },
     label: {
       type: String,
-      default: "Представьтесь",
+      default: "",
     },
     theme: {
       type: String,
@@ -48,7 +98,37 @@ export default {
       type: String,
       default: "",
     },
+    type:{
+      type:String,
+      default:'text',
+      validator: (value) => {return ["text", "tel","email"].includes(value);},
+    },
+    rules:{
+      type:String,
+      default:''
+    },
+    disabled:{
+      type:Boolean,
+      default:false
+    },
+    focusable:{
+      type:Boolean,
+      default:true
+    },
+    readonly:{
+      type:Boolean,
+      default:false
+    }
   },
+  methods:{
+    clickSuffix(event){
+      event.preventDefault();
+      this.$emit('clickSuffix')
+    },
+    focus(){
+      this.$emit('focus')
+    }
+  }
 };
 </script>
 
@@ -56,27 +136,62 @@ export default {
 @require '~@/assets/stylus/mixins/mixins';
 @require '~@/assets/stylus/vars/variables';
 
-$color-blue=$theme-light.primary.lightest2
+$prefix='.base-text-field'
+$current-color=$theme-light.primary.lightest2
+$error=$theme-light.error.lightest
 
 .base-text-field
+  width 100%
+  height 28px
   transition:all 0.5s
-  flexy()
+  margin 5px 0px
+  flexy(space-between)
   padding-bottom 5px
+  color:$current-color
+  border-bottom 1px solid $current-color
+  &__wrapper
+    width 100%
   &__input
     width 100%
-    height 28px
     setFont(14px,500)
     border none
     outline: none;
-    color:inherit
+    color:white
     background: transparent
     &::placeholder
       color:inherit
       opacity 1
+    &:focus
+      &::placeholder
+         color: transparent
+  >>>&__icon
+    width 18px
+    height 20px
+    cursor pointer
+    margin-left 20px
+  &__errors
+    height 14px
+    setFont(12px,700)
+    color $error
 
-  &_light
-    border-bottom 1px solid $color-blue
-    color:white
   &_focused
     border-bottom 1px solid white
+    color white
+
+  &_invalid
+    color $error
+    border-color $error
+
+  &_disabled
+    .base-text-field
+      &__input
+        color $current-color
+      &__icon
+        cursor auto
+
+.base-text-field
+  &_dark
+    .base-text-field__input
+        color:black
+  
 </style>
