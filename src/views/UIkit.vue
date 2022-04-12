@@ -37,7 +37,7 @@ $background=$theme-light.primary.base
 .ui-kit
   flexy(center,center,nowrap,column)
   &__input
-    width 500px
+    width 50%
     padding 30px
     border-radius 50px
     &_header

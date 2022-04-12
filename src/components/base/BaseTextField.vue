@@ -1,13 +1,13 @@
 <template>
   <validation-provider :rules='(isEmail ? "email|" :"")+rules' v-slot="{ errors,classes}">
-    <div @click='focus'  class="base-text-field" :class="[classes,getClasses]">
+    <div class="base-text-field" :class="[classes,getClasses]">
       <div class='base-text-field__wrapper'>
         <svg-icon class="base-text-field__icon"  v-if="preffixIcon" :name="preffixIcon" />
         <input
           :id='_uid'
           v-mask="isTel ?'+7(###)-###-##-##':''"
           v-model='inputVal'
-          @focus="focusfocused = true"
+          @focus="focus"
           @blur="focused = false"
           class="base-text-field__input"
           type="text"
@@ -15,7 +15,7 @@
           :disabled='disabled'
         />
       </div>
-      <label :disabled='disabled'  :for="_uid" @click='clickSuffix'>
+      <label :disabled='disabled'  :for="_uid" @click.prevent='clickSuffix'>
         <slot name='suffix'>
           <svg-icon
             class="base-text-field__icon"
@@ -121,11 +121,11 @@ export default {
     }
   },
   methods:{
-    clickSuffix(event){
-      event.preventDefault();
+    clickSuffix(){
       this.$emit('clickSuffix')
     },
     focus(){
+      this.focused = true
       this.$emit('focus')
     }
   }

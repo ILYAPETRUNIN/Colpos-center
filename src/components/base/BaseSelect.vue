@@ -1,29 +1,36 @@
 <template>
-    <div class='base-select' :class='{"base-select_show":isShow}'>
+    <div v-on-clickaway="hideDropDown"  class='base-select' :class='{"base-select_show":isShow}'>
       <base-text-field  
-        @focus='isShow=true'
-        v-model='inputVal' 
+        v-model='selectItem.text' 
         :focusable='false'  
         class='base-select__input' 
-        @clickSuffix='isShow=!isShow' 
+        @clickSuffix='toogleDropDown'
+        @focus='showDropDown' 
         suffixIcon='arrow-down'
         :label='label'
         :theme='isShow ?"dark":"light"'
+        :rules='rules'
         readonly
       >
         <template v-slot:suffix>
           <svg-icon class="base-text-field__icon base-select__icon" name="arrow-down"/>
         </template>
       </base-text-field>
-
-      <ul v-if='isShow' class='base-select__dropdown'>
-        <li @click='select(item.value)' class='base-select__dropdown_item' v-for='item in items' :key='item.value'>{{item.text}}</li>
-      </ul>
+      <transition name='fade'>
+        <div v-if='isShow' class='base-select__dropdown'>
+          <ul  class='base-select__dropdown__items'>
+            <li @click='select(item)' class='base-select__dropdown__item' :class='{"base-select__dropdown__item_active":item.value==selectItem.value}' v-for='item in getItems' :key='item.value'>{{item.text}}</li>
+          </ul>
+        </div>
+       </transition>
     </div>
 </template>
 
 <script>
+import { mixin as clickaway } from 'vue-clickaway';
+
 export default {
+  mixins: [ clickaway ],
   props:{
     value: {
       default:''
@@ -34,37 +41,61 @@ export default {
         {text:'Базовый курс кольпоскопии',value:0},
         {text:'Современные аспекты клинической кольпоскопии',value:1},
         {text:'Электрорадиоволновая хирургия в амбулаторной гинекологии',value:2},
-        {text:'Лазерная хирургия в амбулаторной гинекологии',value:3}
+        {text:'Лазерная хирургия в амбулаторной гинекологии',value:3},
+        {text:'Лазерная хирургия в амбулаторной гинекологии',value:4},
+        {text:'Лазерная хирургия в амбулаторной гинекологии',value:5},
+        {text:'Лазерная хирургия в амбулаторной гинекологии',value:6}
       ]
     },
     label: {
       type: String,
       default: "",
     },
+    rules:{
+      type:String,
+      default:''
+    },
   },
 
   data(){
     return{
-      isShow:false
+      isShow:false,
+      selectItem:{
+        text:null,
+        value:null
+      }
     }
   },
   computed: {
     inputVal: {
       get() {
-          const el=this.items.find((item)=>item.value==this.value)
-          if(el) return el.text
           return this.value;
       },
       set(value) {
           this.$emit("input", value);
       }
     },
+    getItems(){
+      if(this.selectItem.text)  return this.items.filter((item)=>item.text.includes(this.selectItem.text))
+      return this.items 
+    }
   },
   methods:{
-    select(value){
-      this.inputVal=value
+    select(item){
+      this.selectItem=Object.assign({},item)
+      this.$emit("input", item.value)
+      this.hideDropDown()
+    },
+    hideDropDown(){
+      this.selectItem=Object.assign({},this.items.find((item)=>item.value==this.value))
       this.isShow=false
-    }
+    },
+    showDropDown(){
+      this.isShow=true
+    },
+    toogleDropDown(){
+      this.isShow=!this.isShow
+    },
   }
 }
 </script>
@@ -72,12 +103,15 @@ export default {
 <style lang="stylus" scoped>
 @require '~@/assets/stylus/mixins/mixins';
 @require '~@/assets/stylus/vars/variables';
+$current-color=$theme-light.secondary.lightes
+
 .base-select
   z-index 9999
   position:relative
   &__icon
     transition transform 0.5s
   &__dropdown
+    width: 100%
     position absolute
     z-index -2
     top 0px
@@ -94,14 +128,21 @@ export default {
       background white
       box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.2);
       border-radius: 10px;
-    &_item
+    &__items
+      padding 0px
+      max-height 300px
+      overflow-y: scroll
+      scrollStyle()
+    &__item
       no-style-list()
       cursor pointer
       border-radius: 10px;
       height 50px
       padding 10px 16px
+      &_active
+        background: $current-color;
       &:hover
-        background: #F5F5F5;
+        background: $current-color;
   &__input
     z-index -1
   
