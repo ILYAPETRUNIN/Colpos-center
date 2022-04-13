@@ -3,11 +3,13 @@
     <h1 >Набор компонентов</h1>
     <div class="ui-kit__input ui-kit__input_light">
       <h3 class="ui-kit__input_header">Элементы ввода</h3>
-      <base-text-field v-model='textField.login' suffixIcon="login" rules='required' label='Представьтесь' />
+      <base-text-field theme='dark' v-model='textField.login' suffixIcon="login" rules='required' label='Представьтесь' />
       <base-text-field disabled suffixIcon="login" rules='required' label='Представьтесь' />
-      <base-text-field v-model='textField.email' type='email' label='Ваш Email' />
+      <base-text-field rules='required' v-model='textField.email' type='email' label='Ваш Email' />
       <base-text-field v-model='textField.tel' type='tel' label='Ваш телефон' />
-      <base-select label='Выберите курс' v-model='select'/>
+      <base-select rules='required' label='Выберите курс' v-model='select'/>
+      <base-date-picker label='Дата начала' v-model='date'/>
+      <base-checkbox v-model='check' label='Отправляя заявку, вы принимаете условия политики конфиденциальности'/>
     </div>
   </div>
 </template>
@@ -23,7 +25,9 @@ export default {
         email:'',
         tel:'',
       },
-      select:''
+      select:'',
+      date:null,
+      check:false
     }
   }
 };

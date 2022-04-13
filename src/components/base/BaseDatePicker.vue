@@ -1,14 +1,13 @@
 <template>
     <div v-on-clickaway="hideDropDown"  class='base-select' :class='{"base-select_show":isShow}'>
       <base-text-field  
-        v-model='selectItem.text' 
+        v-model='formattedDate' 
         :focusable='false'  
         class='base-select__input' 
         @clickSuffix='toogleDropDown'
         @focus='showDropDown' 
         suffixIcon='arrow-down'
         :label='label'
-        :theme='isShow ?"dark":"light"'
         :rules='rules'
         readonly
       >
@@ -18,9 +17,7 @@
       </base-text-field>
       <transition name='fade'>
         <div v-if='isShow' class='base-select__dropdown'>
-          <ul  class='base-select__dropdown__items'>
-            <li @click='select(item)' class='base-select__dropdown__item' :class='{"base-select__dropdown__item_active":item.value==selectItem.value}' v-for='item in getItems' :key='item.value'>{{item.text}}</li>
-          </ul>
+           <VueDatePicker v-model="inputVal" inline :locale="{ lang: 'ru' }" />
         </div>
        </transition>
     </div>
@@ -28,24 +25,15 @@
 
 <script>
 import { mixin as clickaway } from 'vue-clickaway';
+import { VueDatePicker } from '@mathieustan/vue-datepicker';
+import '@mathieustan/vue-datepicker/dist/vue-datepicker.min.css';
 
 export default {
   mixins: [ clickaway ],
+  components : {VueDatePicker},
   props:{
     value: {
       default:''
-    },
-    items:{
-      type:Array,
-      default:()=>[
-        {text:'Базовый курс кольпоскопии',value:0},
-        {text:'Современные аспекты клинической кольпоскопии',value:1},
-        {text:'Электрорадиоволновая хирургия в амбулаторной гинекологии',value:2},
-        {text:'Лазерная хирургия в амбулаторной гинекологии',value:3},
-        {text:'Лазерная хирургия в амбулаторной гинекологии',value:4},
-        {text:'Лазерная хирургия в амбулаторной гинекологии',value:5},
-        {text:'Лазерная хирургия в амбулаторной гинекологии',value:6}
-      ]
     },
     label: {
       type: String,
@@ -60,10 +48,6 @@ export default {
   data(){
     return{
       isShow:false,
-      selectItem:{
-        text:null,
-        value:null
-      }
     }
   },
   computed: {
@@ -75,18 +59,21 @@ export default {
           this.$emit("input", value);
       }
     },
-    getItems(){
-      if(this.selectItem.text)  return this.items.filter((item)=>item.text.includes(this.selectItem.text))
-      return this.items 
+    formattedDate(){
+        let options = {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+        };
+        if(this.inputVal){
+          let date = new Date(this.inputVal);
+          return date.toLocaleString("ru", options);
+        }
+        return null
     }
   },
   methods:{
-    select(item){
-      this.$emit("input", item.value)
-      this.hideDropDown()
-    },
     hideDropDown(){
-      this.selectItem=Object.assign({},this.items.find((item)=>item.value==this.value))
       this.isShow=false
     },
     showDropDown(){
@@ -106,27 +93,14 @@ $current-color=$theme-light.secondary.lightes
 
 .base-select
   position:relative
-  z-index 1
   &__icon
     transition transform 0.5s
   &__dropdown
-    width: 100%
     position absolute
-    z-index -1
+    z-index 9999
     top 0px
     padding 0px
     padding-top 40px
-    &::after
-      content:''
-      position:absolute
-      z-index -3
-      top: -25px;
-      left: -25px;
-      right: -25px;
-      bottom: -25px;
-      background white
-      box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.2);
-      border-radius: 10px;
     &__items
       padding 0px
       max-height 300px
@@ -148,6 +122,4 @@ $current-color=$theme-light.secondary.lightes
   &_show
     .base-select__icon
       transform: rotate(180deg)
-      
-    
 </style>
