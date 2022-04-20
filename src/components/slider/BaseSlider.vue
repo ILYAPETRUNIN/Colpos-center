@@ -2,7 +2,7 @@
   <div class='base-slider'>
       <div class='base-slider__wrapper_3'>
         <div class='base-slider__img base-slider__img_1' v-bind:style="{ 'background-image': 'url(' + url + ')' }"/>
-        <slot/>
+        <slot name='form'/>
       </div>
       <div class='base-slider__wrapper'>
         <div class='base-slider__img base-slider__img_2' v-bind:style="{ 'background-image': 'url(' + url + ')' }"/>
@@ -11,7 +11,10 @@
             <div class='base-slider__img base-slider__img_3' v-bind:style="{ 'background-image': 'url(' + url + ')' }"/>
             <slider-btn circle class='base-slider__btn' :max='urlList.length' v-model='step'/>
           </div>
-          <div class='base-slider__img base-slider__img_4' v-bind:style="{ 'background-image': 'url(' + url + ')' }"/>
+          <div class='base-slider__wrapper_4'>
+            <div class='base-slider__img base-slider__img_4' v-bind:style="{ 'background-image': 'url(' + url + ')' }"/>
+            <slot name='footer'/>
+          </div>
         </div>
       </div>
   </div>
@@ -76,6 +79,9 @@ $current-color=$theme-light.primary.opacity
     &_3
       width 34.86%
       margin-right 2px
+    &_4
+      width 100%
+      flexy(flex-start,flex-start,nowrap,column)
   &__btn
     position: absolute
   &__img
