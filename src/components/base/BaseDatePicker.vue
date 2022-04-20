@@ -1,5 +1,5 @@
 <template>
-    <div v-on-clickaway="hideDropDown"  class='base-select' :class='{"base-select_show":isShow}'>
+    <div v-on-clickaway="hideDropDown"  class='base-select' :class='getClasses'>
       <base-text-field  
         v-model='formattedDate' 
         :focusable='false'  
@@ -9,7 +9,7 @@
         suffixIcon='arrow-down'
         :label='label'
         :rules='rules'
-        readonly
+        :disabled='disabled'
       >
         <template v-slot:suffix>
           <svg-icon class="base-text-field__icon base-select__icon" name="arrow-down"/>
@@ -43,6 +43,10 @@ export default {
       type:String,
       default:''
     },
+    disabled:{
+      type:Boolean,
+      default:false
+    },
   },
 
   data(){
@@ -70,17 +74,23 @@ export default {
           return date.toLocaleString("ru", options);
         }
         return null
-    }
+    },
+    getClasses() {
+      return [
+        this.disabled ? `disabled` :"",
+        this.isShow ?"base-select_show":""
+      ];
+    },
   },
   methods:{
     hideDropDown(){
-      this.isShow=false
+      if(!this.disabled) this.isShow=false
     },
     showDropDown(){
-      this.isShow=true
+      if(!this.disabled) this.isShow=true
     },
     toogleDropDown(){
-      this.isShow=!this.isShow
+      if(!this.disabled) this.isShow=!this.isShow
     },
   }
 }
@@ -90,7 +100,10 @@ export default {
 @require '~@/assets/stylus/mixins/mixins';
 @require '~@/assets/stylus/vars/variables';
 $current-color=$theme-light.secondary.lightes
-
+.disabled
+  .base-select__icon
+    cursor auto
+    
 .base-select
   position:relative
   &__icon

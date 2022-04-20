@@ -60,5 +60,7 @@ export default {
   color:inherit
   fill currentColor
   stroke currentColor
+  height 100%
+  width 100%
 }
 </style>

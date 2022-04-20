@@ -1,12 +1,24 @@
 <template>
   <div class="layout-base">
-    <div class="layout-base__menu_desctop"></div>
-    <router-view />
+    <desctop-menu/>
+    <router-view class="layout-base__page"/>
   </div>
 </template>
 
 <script>
-export default {};
+import DesctopMenu from './components/DesctopMenu.vue'
+export default {
+  components:{DesctopMenu}
+};
 </script>
 
-<style></style>
+<style lang="stylus" scoped>
+@require '~@/assets/stylus/vars/variables';
+@require '~@/assets/stylus/mixins/mixins';
+.layout-base
+  padding 45px
+  flexy(flex-start,center)
+  &__page
+    width 100%
+    flexy(center,center)
+</style> 

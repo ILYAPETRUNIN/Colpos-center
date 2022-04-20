@@ -2,6 +2,7 @@ import Vue from "vue";
 import VueRouter, { RouteConfig } from "vue-router";
 import LayoutBase from "@/layouts/LayoutBase.vue";
 import UIkit from "@/views/UIkit.vue";
+import MainPage from "@/views/MainPage.vue";
 
 Vue.use(VueRouter);
 
@@ -15,6 +16,13 @@ const routes: Array<RouteConfig> = [
     path: "/",
     name: "home",
     component: LayoutBase,
+    children:[
+      {
+        path: "/main",
+        name: "main",
+        component: MainPage ,
+      }
+    ]
   },
 ];
 

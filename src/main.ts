@@ -4,6 +4,7 @@ import router from "./router";
 import store from "./store";
 
 import "./assets/stylus/index.styl";
+import "./assets/css/gridlex.css";
 import "./components/globalComponents";
 import "./plugins/index.js";
 

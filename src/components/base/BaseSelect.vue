@@ -1,5 +1,5 @@
 <template>
-    <div v-on-clickaway="hideDropDown"  class='base-select' :class='{"base-select_show":isShow}'>
+    <div v-on-clickaway="hideDropDown"  class='base-select' :class='getClasses'>
       <base-text-field  
         v-model='selectItem.text' 
         :focusable='false'  
@@ -8,16 +8,22 @@
         @focus='showDropDown' 
         suffixIcon='arrow-down'
         :label='label'
-        :theme='isShow ?"dark":"light"'
+        theme='light'
         :rules='rules'
-        readonly
+        :disabled='disabled'
       >
         <template v-slot:suffix>
           <svg-icon class="base-text-field__icon base-select__icon" name="arrow-down"/>
         </template>
       </base-text-field>
       <transition name='fade'>
+        
         <div v-if='isShow' class='base-select__dropdown'>
+          <base-text-field v-model='selectItem.text' @clickSuffix='toogleDropDown' suffixIcon='arrow-down' :label='label' theme='dark' :rules='rules'>
+            <template v-slot:suffix>
+              <svg-icon class="base-text-field__icon base-select__icon" name="arrow-down"/>
+            </template>
+          </base-text-field>
           <ul  class='base-select__dropdown__items'>
             <li @click='select(item)' class='base-select__dropdown__item' :class='{"base-select__dropdown__item_active":item.value==selectItem.value}' v-for='item in getItems' :key='item.value'>{{item.text}}</li>
           </ul>
@@ -55,6 +61,11 @@ export default {
       type:String,
       default:''
     },
+    disabled:{
+      type:Boolean,
+      default:false
+    },
+    
   },
 
   data(){
@@ -78,7 +89,13 @@ export default {
     getItems(){
       if(this.selectItem.text)  return this.items.filter((item)=>item.text.includes(this.selectItem.text))
       return this.items 
-    }
+    },
+    getClasses() {
+      return [
+        this.disabled ? `disabled` :"",
+        this.isShow ?"base-select_show":""
+      ];
+    },
   },
   methods:{
     select(item){
@@ -90,10 +107,10 @@ export default {
       this.isShow=false
     },
     showDropDown(){
-      this.isShow=true
+      if(!this.disabled)this.isShow=true
     },
     toogleDropDown(){
-      this.isShow=!this.isShow
+      if(!this.disabled) this.isShow=!this.isShow
     },
   }
 }
@@ -104,18 +121,20 @@ export default {
 @require '~@/assets/stylus/vars/variables';
 $current-color=$theme-light.secondary.lightes
 
+.disabled
+  .base-select__icon
+    cursor auto
+
 .base-select
-  position:relative
-  z-index 1
+  position relative
   &__icon
     transition transform 0.5s
   &__dropdown
     width: 100%
     position absolute
-    z-index -1
+    z-index 999
     top 0px
     padding 0px
-    padding-top 40px
     &::after
       content:''
       position:absolute

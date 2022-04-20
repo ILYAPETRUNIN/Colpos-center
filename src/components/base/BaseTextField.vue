@@ -1,6 +1,6 @@
 <template>
-  <validation-provider :rules='(isEmail ? "email|" :"")+rules' v-slot="{ errors,classes}">
-    <div class="base-text-field" :class="[classes,getClasses]">
+  <validation-provider :class="[getTheme]" :rules='(isEmail ? "email|" :"")+rules' v-slot="{ errors,classes}">
+    <div :class='[classes,getClasses]' class="base-text-field">
       <div class='base-text-field__wrapper'>
         <svg-icon class="base-text-field__icon"  v-if="preffixIcon" :name="preffixIcon" />
         <input
@@ -25,7 +25,7 @@
         </slot>
       </label>
     </div>
-    <div class='base-text-field__errors'>
+    <div class='errors'>
       <div class='shake-horizontal' v-if='errors.length>0'>{{ errors[0] }}</div>
     </div>
   </validation-provider>
@@ -39,11 +39,6 @@ import { required,email } from "vee-validate/dist/rules";
 extend("required", {...required,message: "*Заполните обязательное поле",});
 extend("email", {...email,message: "*Не корректный email",});
 
-configure({
-  classes: {
-    invalid: 'base-text-field_invalid',
-  }
-})
 
 export default {
   components: { ValidationProvider },
@@ -66,13 +61,14 @@ export default {
     isEmail(){return this.type=="email"},
     isTel(){return this.type=="tel"},
     getClasses() {
-      const prefix = "base-text-field";
       return [
-        `${prefix}_${this.theme}`,
-        (this.focused && this.focusable) ? `${prefix}_focused` : "",
-        this.disabled ? `${prefix}_disabled` :""
+        (this.focused && this.focusable) ? `focused` : "",
+        this.disabled ? `disabled` :""
       ];
     },
+    getTheme(){
+      return `${this.theme}`
+    }
   },
   props: {
     value: {
@@ -137,8 +133,51 @@ export default {
 @require '~@/assets/stylus/vars/variables';
 
 $prefix='.base-text-field'
-$current-color=$theme-light.primary.lightest2
-$error=$theme-light.error.lightest
+
+$light={
+  base:$theme-light.primary.lightest2
+  error:$theme-light.error.lightest
+  focus:white
+  text:white
+}
+
+$dark={
+  base:$theme-light.primary.lightest2
+  error:$theme-light.error.base
+  focus:black
+  text:black
+}
+
+theme($theme)
+  .errors
+    color $theme.error
+  .base-text-field__input
+    color:$theme.text
+  .base-text-field
+    color:$theme.base
+    border-bottom 1px solid
+    border-color $theme.base
+  .failed
+    color $theme.error
+    border-color $theme.error
+  .focused
+    border-bottom 1px solid
+    border-color $theme.focus !important
+    color $theme.focus !important
+  .disabled
+    .base-text-field__input
+      color $theme.base
+
+.dark
+  theme($dark)
+.light
+  theme($light)
+.errors
+  height 14px
+  setFont(12px,700)
+.disabled
+  .base-text-field__icon
+    cursor auto
 
 .base-text-field
   width 100%
@@ -147,8 +186,6 @@ $error=$theme-light.error.lightest
   margin 5px 0px
   flexy(space-between)
   padding-bottom 5px
-  color:$current-color
-  border-bottom 1px solid $current-color
   &__wrapper
     width 100%
   &__input
@@ -156,7 +193,6 @@ $error=$theme-light.error.lightest
     setFont(14px,500)
     border none
     outline: none;
-    color:white
     background: transparent
     &::placeholder
       color:inherit
@@ -168,30 +204,5 @@ $error=$theme-light.error.lightest
     width 18px
     height 20px
     cursor pointer
-    margin-left 20px
-  &__errors
-    height 14px
-    setFont(12px,700)
-    color $error
-
-  &_focused
-    border-bottom 1px solid white
-    color white
-
-  &_invalid
-    color $error
-    border-color $error
-
-  &_disabled
-    .base-text-field
-      &__input
-        color $current-color
-      &__icon
-        cursor auto
-
-.base-text-field
-  &_dark
-    .base-text-field__input
-        color:black
-  
+    margin-left 20px    
 </style>
