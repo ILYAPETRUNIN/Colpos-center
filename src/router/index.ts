@@ -16,6 +16,7 @@ const routes: Array<RouteConfig> = [
     path: "/",
     name: "home",
     component: LayoutBase,
+    redirect: { name: 'main' }, 
     children:[
       {
         path: "/main",
